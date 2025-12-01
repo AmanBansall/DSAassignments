@@ -1,0 +1,226 @@
+/*
+ * Lab 6, Question 1(a): Menu-Driven Program for DOUBLY Linked List
+ */
+#include <iostream>
+
+using namespace std;
+
+// Node structure for a Doubly Linked List
+struct Node {
+    int data;
+    Node* next;
+    Node* prev;
+
+    Node(int val) {
+        data = val;
+        next = NULL;
+        prev = NULL;
+    }
+};
+
+// 
+Node* head = NULL; // Global head pointer
+
+/**
+ * (a-i) Insertion: As first node
+ */
+void insertAtHead(int val) {
+    Node* newNode = new Node(val);
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+    head->prev = newNode;
+    newNode->next = head;
+    head = newNode;
+}
+
+/**
+ * (a-ii) Insertion: As last node
+ */
+void insertAtEnd(int val) {
+    Node* newNode = new Node(val);
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+    Node* temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+/**
+ * (c) Search for a node
+ * Helper function: Returns the node with the given value, or NULL
+ */
+Node* search(int key) {
+    Node* temp = head;
+    while (temp != NULL) {
+        if (temp->data == key) {
+            return temp;
+        }
+        temp = temp->next;
+    }
+    return NULL;
+}
+
+/**
+ * (a-iii) Insertion: After a specific node
+ */
+void insertAfter(int key, int val) {
+    Node* targetNode = search(key);
+    if (targetNode == NULL) {
+        cout << "Node " << key << " not found." << endl;
+        return;
+    }
+    Node* newNode = new Node(val);
+    newNode->next = targetNode->next;
+    newNode->prev = targetNode;
+    targetNode->next = newNode;
+
+    // If it's not the last node, update the next node's prev
+    if (newNode->next != NULL) {
+        newNode->next->prev = newNode;
+    }
+}
+
+/**
+ * (a-iv) Insertion: Before a specific node
+ */
+void insertBefore(int key, int val) {
+    Node* targetNode = search(key);
+    if (targetNode == NULL) {
+        cout << "Node " << key << " not found." << endl;
+        return;
+    }
+    Node* newNode = new Node(val);
+    newNode->next = targetNode;
+    newNode->prev = targetNode->prev;
+
+    // If target is not the head
+    if (targetNode->prev != NULL) {
+        targetNode->prev->next = newNode;
+    } else {
+        head = newNode; // New node is the new head
+    }
+    targetNode->prev = newNode;
+}
+
+/**
+ * (b) Deletion of a specific node
+ */
+void deleteNode(int key) {
+    Node* target = search(key);
+    if (target == NULL) {
+        cout << "Node " << key << " not found. Cannot delete." << endl;
+        return;
+    }
+
+    // Case 1: Target is the head
+    if (target == head) {
+        head = target->next;
+    }
+
+    // Case 2: Target is not the head (it has a prev)
+    if (target->prev != NULL) {
+        target->prev->next = target->next;
+    }
+
+    // Case 3: Target is not the tail (it has a next)
+    if (target->next != NULL) {
+        target->next->prev = target->prev;
+    }
+
+    delete target;
+    cout << "Node " << key << " deleted." << endl;
+}
+
+/**
+ * Utility: Display the list
+ */
+void display() {
+    if (head == NULL) {
+        cout << "List is empty." << endl;
+        return;
+    }
+    Node* temp = head;
+    cout << "List (forward): NULL <-> ";
+    while (temp != NULL) {
+        cout << temp->data << " <-> ";
+        temp = temp->next;
+    }
+    cout << "NULL" << endl;
+}
+
+// --- Main Menu-Driven Function ---
+int main() {
+    int choice, val, key;
+
+    do {
+        cout << "\n--- Doubly Linked List Menu ---" << endl;
+        cout << "1. Insert at Head" << endl;
+        cout << "2. Insert at End" << endl;
+        cout << "3. Insert After Node" << endl;
+        cout << "4. Insert Before Node" << endl;
+        cout << "5. Delete Node" << endl;
+        cout << "6. Search Node" << endl;
+        cout << "7. Display List" << endl;
+        cout << "0. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter value: "; cin >> val;
+                insertAtHead(val);
+                break;
+            case 2:
+                cout << "Enter value: "; cin >> val;
+                insertAtEnd(val);
+                break;
+            case 3:
+                cout << "Enter key (after which to insert): "; cin >> key;
+                cout << "Enter value to insert: "; cin >> val;
+                insertAfter(key, val);
+                break;
+            case 4:
+                cout << "Enter key (before which to insert): "; cin >> key;
+                cout << "Enter value to insert: "; cin >> val;
+                insertBefore(key, val);
+                break;
+            case 5:
+                cout << "Enter value to delete: "; cin >> val;
+                deleteNode(val);
+                break;
+            case 6:
+                cout << "Enter value to search: "; cin >> val;
+                if (search(val) != NULL) {
+                    cout << "Node " << val << " was found." << endl;
+                } else {
+                    cout << "Node " << val << " was NOT found." << endl;
+                }
+                break;
+            case 7:
+                display();
+                break;
+            case 0:
+                cout << "Exiting..." << endl;
+                break;
+            default:
+                cout << "Invalid choice." << endl;
+        }
+    } while (choice != 0);
+
+    // Cleanup memory
+    Node* current = head;
+    while(current != NULL) {
+        Node* next = current->next;
+        delete current;
+        current = next;
+    }
+
+    return 0;
+}
