@@ -1,0 +1,115 @@
+/*
+ * Lab 9, Question 1: Heapsort
+ */
+#include <iostream>
+#include <algorithm> // For std::swap
+
+using namespace std;
+
+/**
+ * Helper function to print an array.
+ */
+void printArray(int arr[], int n) {
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
+
+/**
+ * The main "bubble-down" function to maintain the heap property.
+ * @param arr The array
+ * @param n Size of the heap
+ * @param i Index to start heapify from (usually the root)
+ * @param isMaxHeap true for Max-Heap (for increasing sort), 
+ * false for Min-Heap (for decreasing sort)
+ */
+void heapify(int arr[], int n, int i, bool isMaxHeap) {
+    int largestOrSmallest = i; // Initialize largest/smallest as root
+    int left = 2 * i + 1;      // left child
+    int right = 2 * i + 2;     // right child
+
+    if (isMaxHeap) {
+        // --- Max-Heap Logic ---
+        // If left child is larger than root
+        if (left < n && arr[left] > arr[largestOrSmallest]) {
+            largestOrSmallest = left;
+        }
+        // If right child is larger than current largest
+        if (right < n && arr[right] > arr[largestOrSmallest]) {
+            largestOrSmallest = right;
+        }
+    } else {
+        // --- Min-Heap Logic ---
+        // If left child is smaller than root
+        if (left < n && arr[left] < arr[largestOrSmallest]) {
+            largestOrSmallest = left;
+        }
+        // If right child is smaller than current smallest
+        if (right < n && arr[right] < arr[largestOrSmallest]) {
+            largestOrSmallest = right;
+        }
+    }
+
+    // If largest/smallest is not the root
+    if (largestOrSmallest != i) {
+        swap(arr[i], arr[largestOrSmallest]);
+
+        // Recursively heapify the affected sub-tree
+        heapify(arr, n, largestOrSmallest, isMaxHeap);
+    }
+}
+
+/**
+ * Main Heapsort function.
+ * @param arr The array to sort
+ * @param n Size of the array
+ * @param sortIncreasing true for increasing (A-Z), false for decreasing (Z-A)
+ */
+void heapSort(int arr[], int n, bool sortIncreasing) {
+    
+    // For increasing sort, we use a Max-Heap.
+    // For decreasing sort, we use a Min-Heap.
+    bool useMaxHeap = sortIncreasing;
+
+    // 
+    // 1. Build the heap (rearrange the array)
+    // We start from the last non-leaf node
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapify(arr, n, i, useMaxHeap);
+    }
+
+    // 2. One by one, extract elements from the heap
+    for (int i = n - 1; i > 0; i--) {
+        // Move the current root (max or min) to the end
+        swap(arr[0], arr[i]);
+
+        // Call heapify on the reduced heap (size i)
+        heapify(arr, i, 0, useMaxHeap);
+    }
+}
+
+
+// --- Main Function to Test ---
+int main() {
+    int arr[] = {12, 11, 13, 5, 6, 7};
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    cout << "Original array: ";
+    printArray(arr, n);
+
+    // Test 1: Increasing Order Sort
+    heapSort(arr, n, true);
+    cout << "Sorted (Increasing): ";
+    printArray(arr, n);
+
+    // --- Reset array for second test ---
+    int arr2[] = {12, 11, 13, 5, 6, 7};
+    
+    // Test 2: Decreasing Order Sort
+    heapSort(arr2, n, false);
+    cout << "Sorted (Decreasing): ";
+    printArray(arr2, n);
+
+    return 0;
+}
