@@ -1,0 +1,81 @@
+#include <iostream>
+using namespace std;
+
+class Node {
+public:
+    int data;
+    Node* next;
+    Node(int v) : data(v), next(NULL) {}
+};
+
+class LinkedList {
+    Node* head;
+public:
+    LinkedList() : head(NULL) {}
+    void insertBegin(int v) {
+        Node* n = new Node(v);
+        n->next = head;
+        head = n;
+    }
+    void insertEnd(int v) {
+        Node* n = new Node(v);
+        if (!head) { head = n; return; }
+        Node* t = head;
+        while (t->next) t = t->next;
+        t->next = n;
+    }
+    void insertAfter(int key, int v) {
+        Node* t = head;
+        while (t && t->data != key) t = t->next;
+        if (!t) return;
+        Node* n = new Node(v);
+        n->next = t->next;
+        t->next = n;
+    }
+    void deleteBegin() {
+        if (!head) return;
+        Node* t = head;
+        head = head->next;
+        delete t;
+    }
+    void deleteEnd() {
+        if (!head) return;
+        if (!head->next) { delete head; head = NULL; return; }
+        Node* t = head;
+        while (t->next->next) t = t->next;
+        delete t->next;
+        t->next = NULL;
+    }
+    void deleteKey(int key) {
+        if (!head) return;
+        if (head->data == key) { Node* t = head; head = head->next; delete t; return; }
+        Node* t = head;
+        while (t->next && t->next->data != key) t = t->next;
+        if (t->next) { Node* d = t->next; t->next = d->next; delete d; }
+    }
+    int search(int key) {
+        Node* t = head; int pos = 1;
+        while (t) { if (t->data == key) return pos; t = t->next; pos++; }
+        return -1;
+    }
+    void display() {
+        Node* t = head;
+        while (t) { cout << t->data << " "; t = t->next; }
+        cout << endl;
+    }
+};
+
+int main() {
+    LinkedList l;
+    l.insertEnd(10);
+    l.insertEnd(20);
+    l.insertBegin(5);
+    l.insertAfter(10, 15);
+    l.display();
+    l.deleteBegin();
+    l.deleteEnd();
+    l.deleteKey(15);
+    l.display();
+    cout << l.search(20) << endl;
+}
+
